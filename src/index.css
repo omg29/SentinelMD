@@ -61,11 +61,39 @@ h4 {
   margin-left: var(--sidebar-width);
   display: flex;
   flex-direction: column;
+  transition: margin-left 0.3s ease;
+}
+
+@media (max-width: 1024px) {
+  .sidebar {
+    transform: translateX(-100%);
+    z-index: 1000;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  
+  .sidebar.open {
+    transform: translateX(0);
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+  }
 }
 
 .top-bar {
   height: var(--header-height);
-  padding: 0 2rem;
+  padding: 0 1.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -76,11 +104,60 @@ h4 {
   z-index: 10;
 }
 
+.mobile-menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--text-main);
+  cursor: pointer;
+  padding: 0.5rem;
+  margin-left: -0.5rem;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 1024px) {
+  .mobile-menu-toggle {
+    display: flex;
+  }
+}
+
+.search-input {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--glass-border);
+  border-radius: 2rem;
+  padding: 0.5rem 1rem 0.5rem 2.5rem;
+  color: white;
+  width: 300px;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+@media (max-width: 768px) {
+  .search-input {
+    width: 140px;
+  }
+  
+  .top-bar {
+    padding: 0 1rem;
+  }
+  
+  .top-bar span {
+    display: none; /* Hide 'Dr. Specialist' text on mobile */
+  }
+}
+
 .content-area {
-  padding: 2rem;
+  padding: 1.5rem;
   max-width: 1400px;
   margin: 0 auto;
   width: 100%;
+}
+
+@media (max-width: 640px) {
+  .content-area {
+    padding: 1rem;
+  }
 }
 
 /* Sidebar Elements */
@@ -145,6 +222,18 @@ h4 {
 @media (max-width: 1100px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .dashboard-grid {
+    gap: 1rem;
   }
 }
 
@@ -287,4 +376,70 @@ h4 {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* Patient Portal Styles */
+.patient-portal {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  position: relative;
+}
+
+.portal-header {
+  position: absolute;
+  top: 2rem;
+  right: 2rem;
+}
+
+.portal-content {
+  max-width: 600px;
+  width: 100%;
+}
+
+.unified-logo {
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.unified-logo h2 {
+  font-size: 1.5rem;
+}
+
+.doctor-login-btn {
+  border: 1px solid var(--glass-border);
+  background: var(--card-bg);
+  cursor: pointer;
+}
+
+.portal-footer {
+  margin-top: 2rem;
+  color: #475569;
+  font-size: 0.8rem;
+}
+
+@media (max-width: 640px) {
+  .patient-portal {
+    padding: 1.5rem 1rem;
+    justify-content: flex-start;
+  }
+  
+  .portal-header {
+    position: static;
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 2rem;
+  }
+  
+  .unified-logo h2 {
+    font-size: 1.25rem;
+  }
+  
+  .portal-content {
+    padding-bottom: 4rem;
+  }
 }

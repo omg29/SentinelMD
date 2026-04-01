@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Activity, LayoutDashboard, UserPlus, FileText, Settings, Bell, Search, ShieldCheck, LogOut, User } from 'lucide-react';
+import { Activity, LayoutDashboard, UserPlus, FileText, Settings, Bell, Search, ShieldCheck, LogOut, User, Menu, X } from 'lucide-react';
 import axios from 'axios';
 import IntakePortal from './components/IntakePortal';
 import Dashboard from './components/Dashboard';
@@ -9,6 +9,7 @@ function App() {
   const [submissions, setSubmissions] = useState([]);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [lastSubmissionId, setLastSubmissionId] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const fetchSubmissions = async () => {
     try {
@@ -31,18 +32,18 @@ function App() {
 
   if (view === 'patient') {
     return (
-      <div className="patient-portal" style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-        <div style={{ position: 'absolute', top: '2rem', right: '2rem' }}>
-          <button onClick={() => setView('doctor')} className="nav-item" style={{ border: '1px solid var(--glass-border)', background: 'var(--card-bg)', cursor: 'pointer' }}>
+      <div className="patient-portal">
+        <div className="portal-header">
+          <button onClick={() => setView('doctor')} className="nav-item doctor-login-btn">
             <ShieldCheck size={18} />
             <span>Doctor Login</span>
           </button>
         </div>
 
-        <div style={{ maxWidth: '600px', width: '100%' }}>
-          <div className="logo-container" style={{ justifyContent: 'center', marginBottom: '2rem' }}>
+        <div className="portal-content">
+          <div className="logo-container unified-logo">
             <div className="logo-icon"><ShieldCheck size={20} color="white" /></div>
-            <h2 style={{ fontSize: '1.5rem' }}>SentinelMD Patient Portal</h2>
+            <h2>SentinelMD Patient Portal</h2>
           </div>
 
           {!lastSubmissionId ? (
@@ -67,7 +68,7 @@ function App() {
             </div>
           )}
         </div>
-        <footer style={{ marginTop: '2rem', color: '#475569', fontSize: '0.8rem' }}>
+        <footer className="portal-footer">
           &copy; 2025 SentinelMD Science Fair Project
         </footer>
       </div>
@@ -75,9 +76,17 @@ function App() {
   }
 
   return (
-    <div className="app-layout">
+    <div className={`app-layout ${isMobileMenuOpen ? 'mobile-menu-active' : ''}`}>
+      {/* Sidebar Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="sidebar-overlay" 
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="sidebar">
+      <aside className={`sidebar ${isMobileMenuOpen ? 'open' : ''}`}>
         <div className="logo-container">
           <div className="logo-icon">
             <ShieldCheck size={20} color="white" />
@@ -107,13 +116,21 @@ function App() {
       {/* Main Content */}
       <main className="main-content">
         <header className="top-bar">
-          <div style={{ position: 'relative' }}>
-            <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
-            <input
-              type="text"
-              placeholder="Search patients..."
-              style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '2rem', padding: '0.5rem 1rem 0.5rem 2.5rem', color: 'white', width: '300px', fontSize: '0.9rem' }}
-            />
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+            <button 
+              className="mobile-menu-toggle"
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+            <div className="search-container" style={{ position: 'relative' }}>
+              <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: '#64748b' }} />
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search..."
+              />
+            </div>
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
@@ -128,7 +145,7 @@ function App() {
         </header>
 
         <section className="content-area">
-          <div className="dashboard-grid" style={{ gridTemplateColumns: '320px 1fr' }}>
+          <div className="dashboard-grid">
             {/* Patient Queue */}
             <div className="glass-card" style={{ padding: '0', display: 'flex', flexDirection: 'column' }}>
               <div style={{ padding: '1.5rem', borderBottom: '1px solid var(--glass-border)' }}>

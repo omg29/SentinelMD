@@ -99,7 +99,7 @@ const IntakePortal = ({ onResult }) => {
                     Personal Information
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr 1fr', gap: '1rem', marginBottom: '1.5rem' }}>
+                <div className="personal-info-grid">
                     <div className="form-group">
                         <label className="input-label">Full Name</label>
                         <input
@@ -181,6 +181,21 @@ const IntakePortal = ({ onResult }) => {
                     font-weight: 500;
                     text-transform: uppercase;
                     letter-spacing: 0.05em;
+                }
+                .personal-info-grid {
+                    display: grid;
+                    grid-template-columns: 1.5fr 1fr 1fr;
+                    gap: 1rem;
+                    margin-bottom: 1.5rem;
+                }
+                @media (max-width: 640px) {
+                    .personal-info-grid {
+                        grid-template-columns: 1fr;
+                        gap: 0.5rem;
+                    }
+                    .toggle-grid {
+                        grid-template-columns: 1fr !important;
+                    }
                 }
             `}} />
         </div >

@@ -137,11 +137,11 @@ const Dashboard = ({ result, onUpdate }) => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
                 <div>
                     <h3 style={{ fontSize: '1.5rem', marginBottom: '0.25rem' }}>Patient Health Overview</h3>
-                    <div style={{ display: 'flex', gap: '1.5rem', marginTop: '0.5rem' }}>
-                        <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>
+                    <div className="patient-meta-row">
+                        <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)', margin: 0 }}>
                             Patient: <strong>{patient_name}</strong> • Age: <strong>{age}</strong>
                         </p>
-                        <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                        <div className="vitals-input-group">
                            <input 
                              type="number" 
                              className="vitals-mini-input" 
@@ -183,7 +183,7 @@ const Dashboard = ({ result, onUpdate }) => {
             </div>
 
             {/* Disease Summary Cards */}
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '2rem' }}>
+            <div className="disease-summary-grid">
                 {experts.map(exp => {
                     const data = predictions[exp.id];
                     if (!data) return (
@@ -227,7 +227,7 @@ const Dashboard = ({ result, onUpdate }) => {
                     </div>
                 </div>
 
-                <div style={{ display: 'grid', gridTemplateColumns: '1.5fr 1fr', gap: '1.5rem', marginBottom: '2rem' }}>
+                <div className="analysis-grid-container">
                     <div>
                         <p style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '1.25rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <Info size={14} />
@@ -335,6 +335,53 @@ const Dashboard = ({ result, onUpdate }) => {
                 .vitals-save-btn:disabled {
                     opacity: 0.5;
                     cursor: not-allowed;
+                }
+                .disease-summary-grid {
+                    display: grid;
+                    grid-template-columns: repeat(3, 1fr);
+                    gap: 1rem;
+                    margin-bottom: 2rem;
+                }
+                .analysis-grid-container {
+                    display: grid;
+                    grid-template-columns: 1.5fr 1fr;
+                    gap: 1.5rem;
+                    margin-bottom: 2rem;
+                }
+                .patient-meta-row {
+                    display: flex;
+                    gap: 1.5rem;
+                    margin-top: 0.5rem;
+                    align-items: center;
+                }
+                .vitals-input-group {
+                    display: flex;
+                    gap: 0.75rem;
+                    align-items: center;
+                }
+                @media (max-width: 900px) {
+                    .disease-summary-grid {
+                        grid-template-columns: repeat(2, 1fr);
+                    }
+                    .analysis-grid-container {
+                        grid-template-columns: 1fr;
+                    }
+                }
+                @media (max-width: 640px) {
+                    .disease-summary-grid {
+                        grid-template-columns: 1fr;
+                    }
+                    .patient-meta-row {
+                        flex-direction: column;
+                        align-items: flex-start;
+                        gap: 1rem;
+                    }
+                    .vitals-input-group {
+                        flex-wrap: wrap;
+                    }
+                    .vitals-mini-input {
+                        width: 60px;
+                    }
                 }
             `}} />
         </div>

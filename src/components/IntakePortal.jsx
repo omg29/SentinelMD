@@ -45,7 +45,12 @@ const IntakePortal = ({ onResult }) => {
             else sanitizedData[key] = parseFloat(sanitizedData[key]);
         });
 
-        const API_URL = import.meta.env.VITE_API_URL || '';
+        const getBaseUrl = () => {
+            if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+            if (typeof window !== 'undefined') return window.location.origin;
+            return '';
+        };
+        const API_URL = getBaseUrl();
         
         // Retry logic implementation
         const attemptRequest = async (retries = 3, backoff = 1000) => {
@@ -66,11 +71,13 @@ const IntakePortal = ({ onResult }) => {
                     await new Promise(resolve => setTimeout(resolve, backoff));
                     return attemptRequest(retries - 1, backoff * 2);
                 }
-                console.error(err);
+                const errorMessage = err.response?.data?.detail || err.message || "Unknown Error";
+                console.error("Diagnostic Engine Failure:", err);
+                
                 if (err.code === 'ECONNABORTED') {
-                    setError("Analysis Core Timeout (60s). The clinical engine is under heavy load. Please retry.");
+                    setError(`TIMEOUT ERROR (60s): The clinical engine failed to respond in time. Output: ${errorMessage}`);
                 } else {
-                    setError("Engine Connectivity Error. Verify Analysis Core status and network mapping.");
+                    setError(`CONNECTIVITY ERROR: Analysis core unreachable at ${API_URL}. Raw Error: ${errorMessage}`);
                 }
             } finally {
                 setIsAnalyzing(false);
@@ -107,9 +114,27 @@ const IntakePortal = ({ onResult }) => {
             </div>
 
             {error && (
-                <div style={{ background: 'rgba(244, 63, 94, 0.1)', border: '1px solid var(--accent-rose)', color: 'var(--accent-rose)', padding: '0.75rem', borderRadius: '0.75rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.8rem' }}>
-                    <AlertCircle size={16} />
-                    {error}
+                <div style={{ 
+                    background: 'rgba(244, 63, 94, 0.2)', 
+                    border: '2px solid var(--accent-rose)', 
+                    color: 'white', 
+                    padding: '1rem', 
+                    borderRadius: '1rem', 
+                    marginBottom: '1.5rem', 
+                    display: 'flex', 
+                    flexDirection: 'column',
+                    gap: '0.5rem', 
+                    fontSize: '0.85rem',
+                    boxShadow: '0 8px 32px rgba(244, 63, 94, 0.3)',
+                    animation: 'shake 0.4s ease-in-out'
+                }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontWeight: 700 }}>
+                        <AlertCircle size={20} />
+                        DIAGNOSTIC ENGINE FAULT
+                    </div>
+                    <div style={{ opacity: 0.9, fontFamily: 'monospace', wordBreak: 'break-all' }}>
+                        {error}
+                    </div>
                 </div>
             )}
 
@@ -216,6 +241,19 @@ const IntakePortal = ({ onResult }) => {
                     .toggle-grid {
                         grid-template-columns: 1fr !important;
                     }
+                }
+                @keyframes shake {
+                    0%, 100% { transform: translateX(0); }
+                    25% { transform: translateX(-5px); }
+                    75% { transform: translateX(5px); }
+                }
+                @media (hover: hover) {
+                    .toggle-item:hover { background: rgba(255, 255, 255, 0.06); }
+                }
+                /* Ensure touch targets are reactive */
+                .btn-primary:active {
+                    transform: scale(0.98);
+                    opacity: 0.9;
                 }
             `}} />
         </div >

@@ -192,13 +192,21 @@ h4 {
   cursor: pointer;
 }
 
-.nav-item:hover,
-.nav-item.active {
-  background: rgba(255, 255, 255, 0.05);
-  color: var(--text-main);
+@media (hover: hover) {
+  .nav-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+  }
+}
+
+.nav-item:active {
+  background: rgba(255, 255, 255, 0.1);
+  transform: scale(0.98);
 }
 
 .nav-item.active {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-main);
   border-left: 3px solid var(--primary);
 }
 
@@ -215,20 +223,14 @@ h4 {
 /* Dashboard Grid */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: 350px 1fr;
-  gap: 2rem;
+  grid-template-columns: 320px 1fr;
+  gap: 1.5rem;
 }
 
 @media (max-width: 1100px) {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
-}
-
-.dashboard-grid {
-  display: grid;
-  grid-template-columns: 320px 1fr;
-  gap: 1.5rem;
 }
 
 @media (max-width: 768px) {
@@ -283,8 +285,14 @@ h4 {
   transition: all 0.2s;
 }
 
-.toggle-item:hover {
-  background: rgba(255, 255, 255, 0.06);
+@media (hover: hover) {
+  .toggle-item:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+}
+
+.toggle-item:active {
+  background: rgba(255, 255, 255, 0.08);
 }
 
 .toggle-item.active {
@@ -328,9 +336,16 @@ h4 {
   z-index: 1000;
 }
 
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(0, 210, 255, 0.3);
+@media (hover: hover) {
+  .btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 210, 255, 0.3);
+  }
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px rgba(0, 210, 255, 0.2);
 }
 
 /* Badges */

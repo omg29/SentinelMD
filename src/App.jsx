@@ -13,7 +13,13 @@ function App() {
 
   const fetchSubmissions = async () => {
     try {
-      const resp = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/submissions`);
+      const getBaseUrl = () => {
+          if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
+          if (typeof window !== 'undefined') return window.location.origin;
+          return '';
+      };
+      const API_URL = getBaseUrl();
+      const resp = await axios.get(`${API_URL}/api/submissions`);
       setSubmissions(resp.data.reverse());
     } catch (err) {
       console.error("Failed to fetch submissions");

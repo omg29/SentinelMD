@@ -22,6 +22,8 @@ const IntakePortal = ({ onResult }) => {
 
     const [error, setError] = useState('');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
+    const [analysisStatus, setAnalysisStatus] = useState('');
+    const [progress, setProgress] = useState(0);
 
     const validate = () => {
         if (!patientInfo.name || !patientInfo.dob) {
@@ -38,6 +40,8 @@ const IntakePortal = ({ onResult }) => {
 
         setIsAnalyzing(true);
         setError('');
+        setProgress(0);
+        setAnalysisStatus('Initiating secure connection...');
 
         const sanitizedData = { ...clinicalData };
         ['glucose', 'bmi', 'heart_rate'].forEach(key => {
@@ -45,43 +49,59 @@ const IntakePortal = ({ onResult }) => {
             else sanitizedData[key] = parseFloat(sanitizedData[key]);
         });
 
-        // Retry logic implementation
-        const attemptRequest = async (retries = 3, backoff = 1000) => {
+        try {
             const API_URL = import.meta.env.VITE_API_URL || '';
-            try {
-                const response = await axios.post(`${API_URL}/api/generate-report`, {
+            const response = await fetch(`${API_URL}/api/generate-report`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
                     patient_name: patientInfo.name,
                     dob: patientInfo.dob,
                     gender: patientInfo.gender,
                     patient_data: sanitizedData
-                }, { 
-                    timeout: 60000,
-                    headers: { 'Content-Type': 'application/json' }
-                });
-                onResult(response.data);
-            } catch (err) {
-                if (retries > 0 && (!err.response || err.response.status >= 500)) {
-                    console.log(`Retrying... attempts left: ${retries}`);
-                    await new Promise(resolve => setTimeout(resolve, backoff));
-                    return attemptRequest(retries - 1, backoff * 2);
-                }
-                const errorMessage = err.response?.data?.detail || err.message || "Unknown Error";
-                console.error("Diagnostic Engine Failure:", err);
+                })
+            });
+
+            if (!response.ok) throw new Error(`HTTP Error ${response.status}`);
+
+            const reader = response.body.getReader();
+            const decoder = new TextDecoder();
+            let resultData = null;
+
+            while (true) {
+                const { done, value } = await reader.read();
+                if (done) break;
+
+                const chunk = decoder.decode(value, { stream: true });
+                const lines = chunk.split('\n').filter(l => l.trim());
                 
-                // Direct alert box for mobile debugging as requested
-                alert(`ENGINE ERROR: ${errorMessage}`);
-
-                if (err.code === 'ECONNABORTED') {
-                    setError(`TIMEOUT ERROR (60s): The clinical engine failed to respond in time. Output: ${errorMessage}`);
-                } else {
-                    setError(`CONNECTIVITY ERROR: Analysis core unreachable. Raw Error: ${errorMessage}`);
+                for (const line of lines) {
+                    try {
+                        const data = JSON.parse(line);
+                        if (data.status) setAnalysisStatus(data.status);
+                        if (data.progress) setProgress(data.progress);
+                        if (data.result) resultData = data.result;
+                        if (data.error) throw new Error(data.error);
+                    } catch (parseErr) {
+                        console.warn("Partial chunk received", line);
+                    }
                 }
-            } finally {
-                setIsAnalyzing(false);
             }
-        };
 
-        await attemptRequest();
+            if (resultData) {
+                onResult(resultData);
+            } else {
+                throw new Error("Analysis completed but no report data was returned.");
+            }
+
+        } catch (err) {
+            console.error("Diagnostic Engine Failure:", err);
+            alert(`ENGINE ERROR: ${err.message}`);
+            setError(`CONNECTIVITY ERROR: ${err.message}`);
+        } finally {
+            setIsAnalyzing(false);
+            setProgress(0);
+        }
     };
 
     const renderToggle = (field, label) => {
@@ -194,6 +214,27 @@ const IntakePortal = ({ onResult }) => {
                     {renderToggle('confusion', 'Confusion')}
                 </div>
 
+                {isAnalyzing && (
+                    <div style={{ marginTop: '1.5rem', marginBottom: '0.5rem' }}>
+                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.5rem', fontSize: '0.75rem', color: 'var(--primary)' }}>
+                            <span>{analysisStatus}</span>
+                            <span>{progress}%</span>
+                        </div>
+                        <div className="progress-container" style={{ height: '6px', background: 'rgba(255,255,255,0.05)', borderRadius: '10px', overflow: 'hidden' }}>
+                            <div 
+                                className="progress-bar" 
+                                style={{ 
+                                    width: `${progress}%`, 
+                                    height: '100%', 
+                                    background: 'linear-gradient(90deg, var(--primary), var(--secondary))',
+                                    transition: 'width 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
+                                    boxShadow: '0 0 10px var(--primary-glow)'
+                                }}
+                            />
+                        </div>
+                    </div>
+                )}
+
                 <button
                     type="submit"
                     className="btn-primary"
@@ -201,7 +242,7 @@ const IntakePortal = ({ onResult }) => {
                     onTouchEnd={(e) => {
                       if (!isAnalyzing) handleSubmit(e);
                     }}
-                    style={{ marginTop: '2rem', zIndex: 9999, position: 'relative', width: '100%', pointerEvents: 'auto', cursor: isAnalyzing ? 'wait' : 'pointer' }}
+                    style={{ marginTop: '1.5rem', zIndex: 9999, position: 'relative', width: '100%', pointerEvents: 'auto', cursor: isAnalyzing ? 'wait' : 'pointer' }}
                 >
                     {isAnalyzing ? (
                         <span>Cross-Referencing All Diagnostic Engines...</span>

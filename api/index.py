@@ -7,8 +7,12 @@ except ImportError:
     from ml_core import ExpertRegistry
     from fhir_utils import map_to_fhir_questionnaire_response
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
+import json
+import os
+import asyncio
+from datetime import datetime
 from typing import Dict, Any
-
 app = FastAPI(title="SentinelMD Backend")
 
 # Enable CORS for React frontend
@@ -96,38 +100,65 @@ async def get_submissions():
     return []
 
 @app.post("/api/generate-report")
-async def predict(req: IntakeRequest):
-    try:
-        # Inject age and gender into patient_data for the registry
-        calculated_age = calculate_age(req.dob)
-        unified_payload = {
-            **req.patient_data,
-            "age": calculated_age,
-            "gender": req.gender,
-            "patient_name": req.patient_name,
-            "dob": req.dob
-        }
-        
-        # Perform multi-disease prediction
-        predictions = registry.predict_multi(unified_payload)
-        
-        fhir_json = map_to_fhir_questionnaire_response(unified_payload, "Unified Diagnostic Screening")
-        
-        result = {
-            "id": fhir_json["id"],
-            "patient_name": req.patient_name,
-            "age": calculated_age,
-            "timestamp": datetime.now().isoformat(),
-            "patient_data": req.patient_data,
-            "predictions": predictions,
-            "fhir_report": fhir_json
-        }
-        
-        save_submission(result)
-        return result
-    except Exception as e:
-        print(f"Prediction Error: {e}")
-        raise HTTPException(status_code=500, detail=str(e))
+async def predict_stream(req: IntakeRequest):
+    async def report_generator():
+        try:
+            yield json.dumps({"status": "Initializing Analysis Core...", "progress": 5}) + "\n"
+            await asyncio.sleep(0.1) # Yield control
+            
+            calculated_age = calculate_age(req.dob)
+            unified_payload = {
+                **req.patient_data,
+                "age": calculated_age,
+                "gender": req.gender,
+                "patient_name": req.patient_name,
+                "dob": req.dob
+            }
+            
+            yield json.dumps({"status": "Synchronizing Clinical Experts...", "progress": 15}) + "\n"
+            await asyncio.sleep(0.1)
+
+            # Manually iterate through experts to provide incremental feedback
+            results = {}
+            expert_keys = list(registry.experts.keys())
+            total_experts = len(expert_keys)
+
+            for i, key in enumerate(expert_keys):
+                display_name = registry.experts[key].name
+                yield json.dumps({
+                    "status": f"Analyzing {display_name} risk indicators...", 
+                    "progress": 20 + int((i / total_experts) * 60)
+                }) + "\n"
+                await asyncio.sleep(0.01)
+                
+                # Perform prediction for this specific expert
+                # We simulate calling registry.predict here to get incremental results
+                results[key] = registry.predict(key, unified_payload)
+
+            yield json.dumps({"status": "Generating FHIR Clinical Report...", "progress": 85}) + "\n"
+            await asyncio.sleep(0.1)
+            
+            fhir_json = map_to_fhir_questionnaire_response(unified_payload, "Unified Diagnostic Screening")
+            
+            result = {
+                "id": fhir_json["id"],
+                "patient_name": req.patient_name,
+                "age": calculated_age,
+                "timestamp": datetime.now().isoformat(),
+                "patient_data": req.patient_data,
+                "predictions": results,
+                "fhir_report": fhir_json
+            }
+            
+            save_submission(result)
+            
+            yield json.dumps({"status": "Analysis Complete.", "progress": 100, "result": result}) + "\n"
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            yield json.dumps({"error": str(e), "status": "Engine failure"}) + "\n"
+
+    return StreamingResponse(report_generator(), media_type="application/x-ndjson")
 
 def update_submission(submission_id, data):
     submissions = []

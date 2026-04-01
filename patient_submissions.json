@@ -14160,5 +14160,351 @@
                 }
             ]
         }
+    },
+    {
+        "id": "d40bbd85-e5a9-49e5-a73e-8aabc789b2d5",
+        "patient_name": "wdwd",
+        "age": -499,
+        "timestamp": "2026-04-01T10:00:05.011487",
+        "patient_data": {
+            "smoking": 0,
+            "coughing": 1,
+            "fever": 0,
+            "sore_throat": 0,
+            "head_ache": 0,
+            "chest_pain": 0,
+            "fatigue": 0,
+            "wheezing": 0,
+            "allergy": 0,
+            "memory_loss": 0,
+            "confusion": 0,
+            "glucose": null,
+            "bmi": null,
+            "heart_rate": null
+        },
+        "predictions": {
+            "lung_cancer": {
+                "score": 0.10316193103790283,
+                "category": "Low Risk",
+                "drivers": [
+                    {
+                        "feature": "alcohol_consuming",
+                        "impact": 1.8184187412261963
+                    },
+                    {
+                        "feature": "allergy",
+                        "impact": -1.4309444427490234
+                    },
+                    {
+                        "feature": "fatigue",
+                        "impact": -0.8072859048843384
+                    }
+                ],
+                "recommendation": "Routine screening as per local health guidelines."
+            },
+            "diabetes": {
+                "score": 0.006659237667918205,
+                "category": "Low Risk",
+                "drivers": [
+                    {
+                        "feature": "bmi",
+                        "impact": -1.9964280128479004
+                    },
+                    {
+                        "feature": "age",
+                        "impact": -1.6895462274551392
+                    },
+                    {
+                        "feature": "glucose",
+                        "impact": -0.7668805122375488
+                    }
+                ],
+                "recommendation": "Continue routine preventative care."
+            },
+            "covid19": {
+                "score": 0.9623836874961853,
+                "category": "High Risk",
+                "drivers": [
+                    {
+                        "feature": "cough",
+                        "impact": 3.5794761180877686
+                    },
+                    {
+                        "feature": "fever",
+                        "impact": -0.1312558799982071
+                    },
+                    {
+                        "feature": "gender",
+                        "impact": -0.13072149455547333
+                    }
+                ],
+                "recommendation": "Urgent: PCR Test recommended. Immediate isolation required."
+            },
+            "heart_disease": {
+                "score": 0.954567551612854,
+                "category": "High Risk",
+                "drivers": [
+                    {
+                        "feature": "ca",
+                        "impact": 1.1425389051437378
+                    },
+                    {
+                        "feature": "cp",
+                        "impact": -1.0424667596817017
+                    },
+                    {
+                        "feature": "oldpeak",
+                        "impact": 1.0054806470870972
+                    }
+                ],
+                "recommendation": "Urgent: Cardiology consultation and stress test recommended."
+            },
+            "kidney_disease": {
+                "score": 0.06950974464416504,
+                "category": "Low Risk",
+                "drivers": [
+                    {
+                        "feature": "sc",
+                        "impact": -1.99113929271698
+                    },
+                    {
+                        "feature": "pcv",
+                        "impact": 1.3895599842071533
+                    },
+                    {
+                        "feature": "sg",
+                        "impact": -0.6828140616416931
+                    }
+                ],
+                "recommendation": "Kidney function appears stable. Maintain hydration and healthy BP."
+            },
+            "stroke": {
+                "score": 0.0007234073127619922,
+                "category": "Low Risk",
+                "drivers": [
+                    {
+                        "feature": "age",
+                        "impact": -4.3647990226745605
+                    },
+                    {
+                        "feature": "bmi",
+                        "impact": -1.9579604864120483
+                    },
+                    {
+                        "feature": "avg_glucose_level",
+                        "impact": -0.8851425647735596
+                    }
+                ],
+                "recommendation": "Maintain healthy lifestyle. Regular check-ups recommended."
+            },
+            "dementia": {
+                "score": 0.006575353443622589,
+                "category": "Low Risk",
+                "drivers": [
+                    {
+                        "feature": "age",
+                        "impact": -2.8780460357666016
+                    },
+                    {
+                        "feature": "educationyears",
+                        "impact": -1.3095957040786743
+                    },
+                    {
+                        "feature": "smoking",
+                        "impact": 0.7394083738327026
+                    }
+                ],
+                "recommendation": "Maintain healthy lifestyle with cognitive activities and regular health screenings."
+            },
+            "respiratory_disease": {
+                "score": 0.04308836278103772,
+                "category": "Low Risk",
+                "drivers": [
+                    {
+                        "feature": "shortness_of_breath",
+                        "impact": -0.1
+                    },
+                    {
+                        "feature": "wheezing",
+                        "impact": -0.05
+                    },
+                    {
+                        "feature": "smoking",
+                        "impact": -0.05
+                    }
+                ],
+                "recommendation": "No significant respiratory indicators detected."
+            }
+        },
+        "fhir_report": {
+            "resourceType": "QuestionnaireResponse",
+            "id": "d40bbd85-e5a9-49e5-a73e-8aabc789b2d5",
+            "status": "completed",
+            "authored": "2026-04-01T14:00:05.010480Z",
+            "item": [
+                {
+                    "linkId": "smoking",
+                    "text": "Smoking",
+                    "answer": [
+                        {
+                            "valueDecimal": 0.0
+                        }
+                    ]
+                },
+                {
+                    "linkId": "coughing",
+                    "text": "Coughing",
+                    "answer": [
+                        {
+                            "valueDecimal": 1.0
+                        }
+                    ]
+                },
+                {
+                    "linkId": "fever",
+                    "text": "Fever",
+                    "answer": [
+                        {
+                            "valueDecimal": 0.0
+                        }
+                    ]
+                },
+                {
+                    "linkId": "sore_throat",
+                    "text": "Sore Throat",
+                    "answer": [
+                        {
+                            "valueDecimal": 0.0
+                        }
+                    ]
+                },
+                {
+                    "linkId": "head_ache",
+                    "text": "Head Ache",
+                    "answer": [
+                        {
+                            "valueDecimal": 0.0
+                        }
+                    ]
+                },
+                {
+                    "linkId": "chest_pain",
+                    "text": "Chest Pain",
+                    "answer": [
+                        {
+                            "valueDecimal": 0.0
+                        }
+                    ]
+                },
+                {
+                    "linkId": "fatigue",
+                    "text": "Fatigue",
+                    "answer": [
+                        {
+                            "valueDecimal": 0.0
+                        }
+                    ]
+                },
+                {
+                    "linkId": "wheezing",
+                    "text": "Wheezing",
+                    "answer": [
+                        {
+                            "valueDecimal": 0.0
+                        }
+                    ]
+                },
+                {
+                    "linkId": "allergy",
+                    "text": "Allergy",
+                    "answer": [
+                        {
+                            "valueDecimal": 0.0
+                        }
+                    ]
+                },
+                {
+                    "linkId": "memory_loss",
+                    "text": "Memory Loss",
+                    "answer": [
+                        {
+                            "valueDecimal": 0.0
+                        }
+                    ]
+                },
+                {
+                    "linkId": "confusion",
+                    "text": "Confusion",
+                    "answer": [
+                        {
+                            "valueDecimal": 0.0
+                        }
+                    ]
+                },
+                {
+                    "linkId": "glucose",
+                    "text": "Plasma Glucose Concentration",
+                    "answer": [
+                        {
+                            "valueString": "None"
+                        }
+                    ]
+                },
+                {
+                    "linkId": "bmi",
+                    "text": "Body Mass Index (BMI)",
+                    "answer": [
+                        {
+                            "valueString": "None"
+                        }
+                    ]
+                },
+                {
+                    "linkId": "heart_rate",
+                    "text": "Heart Rate",
+                    "answer": [
+                        {
+                            "valueString": "None"
+                        }
+                    ]
+                },
+                {
+                    "linkId": "age",
+                    "text": "Age",
+                    "answer": [
+                        {
+                            "valueDecimal": -499.0
+                        }
+                    ]
+                },
+                {
+                    "linkId": "gender",
+                    "text": "Gender",
+                    "answer": [
+                        {
+                            "valueDecimal": 1.0
+                        }
+                    ]
+                },
+                {
+                    "linkId": "patient_name",
+                    "text": "Patient Name",
+                    "answer": [
+                        {
+                            "valueString": "wdwd"
+                        }
+                    ]
+                },
+                {
+                    "linkId": "dob",
+                    "text": "Dob",
+                    "answer": [
+                        {
+                            "valueString": "2525-02-05"
+                        }
+                    ]
+                }
+            ]
+        }
     }
 ]

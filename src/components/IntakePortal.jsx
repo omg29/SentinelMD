@@ -74,6 +74,9 @@ const IntakePortal = ({ onResult }) => {
                 const errorMessage = err.response?.data?.detail || err.message || "Unknown Error";
                 console.error("Diagnostic Engine Failure:", err);
                 
+                // Direct alert box for mobile debugging as requested
+                alert(`ENGINE ERROR: ${errorMessage}\nURL: ${API_URL}`);
+
                 if (err.code === 'ECONNABORTED') {
                     setError(`TIMEOUT ERROR (60s): The clinical engine failed to respond in time. Output: ${errorMessage}`);
                 } else {
@@ -201,6 +204,9 @@ const IntakePortal = ({ onResult }) => {
                     type="submit"
                     className="btn-primary"
                     disabled={isAnalyzing}
+                    onTouchEnd={(e) => {
+                      if (!isAnalyzing) handleSubmit(e);
+                    }}
                     style={{ marginTop: '2rem', zIndex: 9999, position: 'relative', width: '100%', pointerEvents: 'auto', cursor: isAnalyzing ? 'wait' : 'pointer' }}
                 >
                     {isAnalyzing ? (

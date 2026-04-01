@@ -74,7 +74,7 @@ const Dashboard = ({ result, onUpdate }) => {
             if (onUpdate) onUpdate(response.data);
         } catch (err) {
             console.error(err);
-            alert("Error updating measurements: Diagnostic engine sync failed.");
+            alert(`VITALS SYNC ERROR: ${err.message}`);
         } finally {
             setIsUpdating(false);
         }
@@ -172,6 +172,7 @@ const Dashboard = ({ result, onUpdate }) => {
                            />
                            <button 
                              onClick={handleUpdateVitals} 
+                             onTouchEnd={handleUpdateVitals}
                              disabled={isUpdating}
                              className="vitals-save-btn"
                            >

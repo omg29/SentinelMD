@@ -23,6 +23,7 @@ function App() {
       setSubmissions(resp.data.reverse());
     } catch (err) {
       console.error("Failed to fetch submissions");
+      alert(`FETCH ERROR: ${err.message}\nURL: ${API_URL}`);
     }
   };
 
@@ -40,7 +41,11 @@ function App() {
     return (
       <div className="patient-portal">
         <div className="portal-header">
-          <button onClick={() => setView('doctor')} className="nav-item doctor-login-btn">
+          <button 
+            onClick={() => setView('doctor')} 
+            className="nav-item doctor-login-btn"
+            onTouchEnd={() => setView('doctor')}
+          >
             <ShieldCheck size={18} />
             <span>Doctor Login</span>
           </button>

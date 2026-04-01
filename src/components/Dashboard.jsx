@@ -66,8 +66,7 @@ const Dashboard = ({ result, onUpdate }) => {
             };
             const getBaseUrl = () => {
                 if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-                if (typeof window !== 'undefined') return window.location.origin;
-                return '';
+                return window.location.origin;
             };
             const API_URL = getBaseUrl();
             const response = await axios.put(`${API_URL}/api/submissions/${result.id}`, payload);

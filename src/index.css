@@ -190,6 +190,7 @@ h4 {
   transition: all 0.2s ease;
   margin-bottom: 0.5rem;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 @media (hover: hover) {
@@ -334,6 +335,7 @@ h4 {
   box-shadow: 0 4px 15px rgba(0, 210, 255, 0.2);
   position: relative;
   z-index: 1000;
+  touch-action: manipulation;
 }
 
 @media (hover: hover) {

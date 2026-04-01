@@ -25,6 +25,7 @@ async def add_cors_headers(request, call_next):
     response.headers["Access-Control-Allow-Origin"] = "*"
     response.headers["Access-Control-Allow-Methods"] = "*"
     response.headers["Access-Control-Allow-Headers"] = "*"
+    response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate, proxy-revalidate"
     return response
 
 registry = ExpertRegistry()

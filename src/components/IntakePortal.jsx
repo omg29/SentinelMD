@@ -45,14 +45,9 @@ const IntakePortal = ({ onResult }) => {
             else sanitizedData[key] = parseFloat(sanitizedData[key]);
         });
 
-        const getBaseUrl = () => {
-            if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-            return window.location.origin;
-        };
-        const API_URL = getBaseUrl();
-        
         // Retry logic implementation
         const attemptRequest = async (retries = 3, backoff = 1000) => {
+            const API_URL = import.meta.env.VITE_API_URL || '';
             try {
                 const response = await axios.post(`${API_URL}/api/generate-report`, {
                     patient_name: patientInfo.name,
@@ -74,12 +69,12 @@ const IntakePortal = ({ onResult }) => {
                 console.error("Diagnostic Engine Failure:", err);
                 
                 // Direct alert box for mobile debugging as requested
-                alert(`ENGINE ERROR: ${errorMessage}\nURL: ${API_URL}`);
+                alert(`ENGINE ERROR: ${errorMessage}`);
 
                 if (err.code === 'ECONNABORTED') {
                     setError(`TIMEOUT ERROR (60s): The clinical engine failed to respond in time. Output: ${errorMessage}`);
                 } else {
-                    setError(`CONNECTIVITY ERROR: Analysis core unreachable at ${API_URL}. Raw Error: ${errorMessage}`);
+                    setError(`CONNECTIVITY ERROR: Analysis core unreachable. Raw Error: ${errorMessage}`);
                 }
             } finally {
                 setIsAnalyzing(false);

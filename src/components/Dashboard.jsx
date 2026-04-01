@@ -64,11 +64,7 @@ const Dashboard = ({ result, onUpdate }) => {
                     heart_rate: editVitals.heart_rate ? parseInt(editVitals.heart_rate) : null
                 }
             };
-            const getBaseUrl = () => {
-                if (import.meta.env.VITE_API_URL) return import.meta.env.VITE_API_URL;
-                return window.location.origin;
-            };
-            const API_URL = getBaseUrl();
+            const API_URL = import.meta.env.VITE_API_URL || '';
             const response = await axios.put(`${API_URL}/api/submissions/${result.id}`, payload);
             if (onUpdate) onUpdate(response.data);
         } catch (err) {

@@ -34,30 +34,50 @@ const IntakePortal = ({ onResult }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (!validate()) return;
+        if (!validate() || isAnalyzing) return;
 
         setIsAnalyzing(true);
-        try {
-            // Convert empty strings to null for backend
-            const sanitizedData = { ...clinicalData };
-            ['glucose', 'bmi', 'heart_rate'].forEach(key => {
-                if (sanitizedData[key] === '') sanitizedData[key] = null;
-                else sanitizedData[key] = parseFloat(sanitizedData[key]);
-            });
+        setError('');
 
-            const response = await axios.post('http://localhost:8000/predict', {
-                patient_name: patientInfo.name,
-                dob: patientInfo.dob,
-                gender: patientInfo.gender,
-                patient_data: sanitizedData
-            }, { timeout: 30000 });
-            onResult(response.data);
-        } catch (err) {
-            console.error(err);
-            setError("Analysis Core Timeout. Verify engine connectivity.");
-        } finally {
-            setIsAnalyzing(false);
-        }
+        const sanitizedData = { ...clinicalData };
+        ['glucose', 'bmi', 'heart_rate'].forEach(key => {
+            if (sanitizedData[key] === '') sanitizedData[key] = null;
+            else sanitizedData[key] = parseFloat(sanitizedData[key]);
+        });
+
+        const API_URL = import.meta.env.VITE_API_URL || '';
+        
+        // Retry logic implementation
+        const attemptRequest = async (retries = 3, backoff = 1000) => {
+            try {
+                const response = await axios.post(`${API_URL}/api/generate-report`, {
+                    patient_name: patientInfo.name,
+                    dob: patientInfo.dob,
+                    gender: patientInfo.gender,
+                    patient_data: sanitizedData
+                }, { 
+                    timeout: 60000,
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                onResult(response.data);
+            } catch (err) {
+                if (retries > 0 && (!err.response || err.response.status >= 500)) {
+                    console.log(`Retrying... attempts left: ${retries}`);
+                    await new Promise(resolve => setTimeout(resolve, backoff));
+                    return attemptRequest(retries - 1, backoff * 2);
+                }
+                console.error(err);
+                if (err.code === 'ECONNABORTED') {
+                    setError("Analysis Core Timeout (60s). The clinical engine is under heavy load. Please retry.");
+                } else {
+                    setError("Engine Connectivity Error. Verify Analysis Core status and network mapping.");
+                }
+            } finally {
+                setIsAnalyzing(false);
+            }
+        };
+
+        await attemptRequest();
     };
 
     const renderToggle = (field, label) => {

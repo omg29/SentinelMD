@@ -13,7 +13,7 @@ function App() {
 
   const fetchSubmissions = async () => {
     try {
-      const resp = await axios.get('http://localhost:8000/submissions');
+      const resp = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/submissions`);
       setSubmissions(resp.data.reverse());
     } catch (err) {
       console.error("Failed to fetch submissions");

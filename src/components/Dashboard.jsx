@@ -54,6 +54,7 @@ const Dashboard = ({ result, onUpdate }) => {
     const { predictions, fhir_report, patient_name, age, patient_data } = result;
 
     const handleUpdateVitals = async () => {
+        if (isUpdating) return;
         setIsUpdating(true);
         try {
             const payload = {
@@ -63,7 +64,8 @@ const Dashboard = ({ result, onUpdate }) => {
                     heart_rate: editVitals.heart_rate ? parseInt(editVitals.heart_rate) : null
                 }
             };
-            const response = await axios.put(`http://localhost:8000/submissions/${result.id}`, payload);
+            const API_URL = import.meta.env.VITE_API_URL || '';
+            const response = await axios.put(`${API_URL}/api/submissions/${result.id}`, payload);
             if (onUpdate) onUpdate(response.data);
         } catch (err) {
             console.error(err);

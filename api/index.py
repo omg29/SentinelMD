@@ -1,7 +1,11 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
-from .ml_core import ExpertRegistry
-from .fhir_utils import map_to_fhir_questionnaire_response
+try:
+    from .ml_core import ExpertRegistry
+    from .fhir_utils import map_to_fhir_questionnaire_response
+except ImportError:
+    from ml_core import ExpertRegistry
+    from fhir_utils import map_to_fhir_questionnaire_response
 from fastapi.middleware.cors import CORSMiddleware
 from typing import Dict, Any
 
@@ -49,11 +53,11 @@ def save_submission(data):
     with open(SUBMISSIONS_FILE, 'w') as f:
         json.dump(submissions, f, indent=4)
 
-@app.get("/health")
+@app.get("/api/health")
 async def health():
     return {"status": "healthy"}
 
-@app.get("/submissions")
+@app.get("/api/submissions")
 async def get_submissions():
     if os.path.exists(SUBMISSIONS_FILE):
         try:
@@ -82,7 +86,7 @@ async def get_submissions():
             return []
     return []
 
-@app.post("/predict")
+@app.post("/api/generate-report")
 async def predict(req: IntakeRequest):
     try:
         # Inject age and gender into patient_data for the registry
@@ -165,7 +169,7 @@ def update_submission(submission_id, data):
 class UpdateRequest(BaseModel):
     patient_data: Dict[str, Any]
 
-@app.put("/submissions/{submission_id}")
+@app.put("/api/submissions/{submission_id}")
 async def update_submission_endpoint(submission_id: str, req: UpdateRequest):
     result = update_submission(submission_id, req.dict())
     if not result:
